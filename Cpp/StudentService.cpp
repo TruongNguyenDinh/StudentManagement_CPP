@@ -1,5 +1,7 @@
 #include"../Header/StudentService.h"
 #include<iostream>
+#include<sstream>
+#include<algorithm>
 using namespace std;
 
 void StudentService::addStudent(const Student& s){
@@ -89,4 +91,30 @@ void StudentService::editScore(int id,double newScore){
         }
     }
     cout<<"No student found with ID"<<endl;
+}
+vector<Student> StudentService::sortStudent(int mode){
+    //Mode 1: sort by name
+    if(mode == 1){
+        stable_sort(students.begin(), students.end(),
+        [](const Student& a, const Student& b) {
+        string nameA = a.getName();
+        string nameB = b.getName();
+        string lastA = nameA.substr(nameA.find_last_of(" ") + 1);
+        string lastB = nameB.substr(nameB.find_last_of(" ") + 1);
+        if (lastA == lastB) {
+            return nameA < nameB;
+        }
+        return lastA < lastB;});
+    }
+    //Mode 2: sort by score
+    else{
+        sort(students.begin(),students.end(),
+        [](const Student& a,const Student& b){
+            return a.getScore()>b.getScore();
+        });
+    }
+    return students;
+}
+vector<Student> StudentService::getStudent() const{
+    return students;
 }

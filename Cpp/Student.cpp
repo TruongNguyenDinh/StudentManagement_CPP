@@ -20,6 +20,7 @@ int Student::getAge() const {return age;}
 double Student::getScore() const {return score;}
 //setter
 int Student::autoGId=1;
+void Student::setID(int addid){id = addid;}
 void Student::setName(const string& newName){name = newName;}
 void Student::setAge(int newAge){age = newAge;}
 void Student::setScore(double newScore){score = newScore;}

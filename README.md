@@ -1,6 +1,14 @@
 # StudentManagement_CPP
 
-#### -----------------------------Dev-------------------------
+#### -----------------------------Extend-------------------------
+
+## What new
+
++ Operator
+
++ Read / Write file
+
++ Extend data.
 
 To run this project. You can download it without git.
 If you have git installed, you can do:

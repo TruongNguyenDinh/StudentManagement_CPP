@@ -23,6 +23,7 @@ class Student{
     int getAge() const;
     double getScore() const;
 
+    void setID(int addid);
     void setName(const string& newName);
     void setAge(int newAge);
     void setScore(double newScore);

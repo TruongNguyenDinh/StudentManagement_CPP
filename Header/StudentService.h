@@ -17,6 +17,8 @@ class StudentService{
     void editName(int id,const string& newName);
     void editAge(int id,int newAge);
     void editScore(int id,double newScore);
+    vector<Student> sortStudent(int mode);
+    vector<Student> getStudent() const;
 
 };
 #endif

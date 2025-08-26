@@ -1,6 +1,9 @@
 #include<iostream>
 #include"../Header/StudentService.h"
+#include"../Header/StudentStorage.h"
 StudentService studentservice;
+StudentStorage studentstorage;
+vector<Student> students;
 void editMode(int mode,int id){
     switch(mode){
         case 1:{
@@ -47,21 +50,166 @@ int isSafe(const string& tmp){
     }
     return 0;
 }
+void UIMenu(){
+    cout<<"\n<=====Student Management=====>\n";
+    cout<<"1: Add new student"<<endl;
+    cout<<"2: Remove student by ID\n";
+    cout<<"3: Display all student\n";
+    cout<<"4: Find Student\n";
+    cout<<"5: Edit Student\n";
+    cout<<"6: Sort\n";
+    cout<<"7: Save student\n";
+    cout<<"8: Load\n";
+    cout<<"9: Infomation\n";
+    cout<<"10: Quit!"<<endl;
+    cout<<"-----------------\n";
+    cout<<"Enter you choice: ";
+}
+void addMode(){
+    cout<<"<=====Add Mode=====>\n";
+    int n; 
+    cout<<"Enter the number of students: ";cin>>n;
+    for (int i = 0;i<n;i++){
+        int id,age;
+        string name;
+        double score;cin.ignore();
+        cout<<"Enter Name: "; getline(cin,name);
+        cout<<"Enter age: ";cin>>age;
+        cout<<"Enter Score: "; cin>>score;
+        Student st(name,age,score);
+        studentservice.addStudent(st);
+        cout<<"------------------------\n";
+    }
+}
+void removeMode(){
+    cout<<"<=====Remove Mode=====>\n";
+    int id;
+    cout<<"Enter ID"<<endl;cin>>id;
+    if(studentservice.removeStudent(id)){
+        cout<<"Done !"<<endl;
+    }
+    else cout<<"Don't exist this student !"<<endl;
+}
+void infMode(){
+    cout<<"<===== INFORMATION OF ALL STUDENT=====>\n";
+    printf("%-5s %-25s %-5s %-6s\n", "ID", "Name", "Age", "Score");
+    studentservice.displayAll();
+}
+void findMode(){
+    cout<<"<===== Find Mode =====>\n";
+    cin.ignore();
+    cout<<"Enter ID or Name: ";
+    string inp;getline(cin,inp);
+    Student* st = studentservice.findStudent(inp);
+    if(!st){
+        cout<<"No student found with ID or Name!\n";               
+    }
+    else{
+        printf("ID: %d\nName: %s\n Age: %d\nScore: %.2f\n",st->getId(),st->getName().c_str(),st->getAge(),st->getScore());
+    }
+}
+void editMode(){
+    bool continueEditMode = true;
+    while(continueEditMode){
+        int id;
+        string tmp;
+        cout<<"<=====Edit Mode=====>"<<endl;
+        cout<<"Enter ID: ";cin>>tmp;
+        id = isSafe(tmp);
+        if(id == 0){
+            cout<<"Invalid input!\n";
+        }
+        else{
+            Student* st = studentservice.findStudent(to_string(id)); 
+            if(!st){
+                cout<<"No student found with ID\n";
+                cout<<"Do you want to continue edit ?\n";
+                cout<<"1: No\nPress anything: Yes\n";
+                int c;cin>>c;
+                if(c == 1) break;
+                else continue;
+            }
+            else{
+                bool isBreak = false;
+                do{
+                    cout<<st->getName()<<" "<<st->getAge()<<" "<<st->getScore()<<endl;
+                    cout<<"1:Edit name\n";
+                    cout<<"2:Edit age\n";
+                    cout<<"3:Edit score\n";
+                    cout<<"4:Quit mode\n";
+                    int choice;
+                    cin>>choice;
+                    if(choice == 4){
+                        isBreak = true;
+                    }
+                    else{
+                        editMode(choice,id);
+                        cout<<"Do you want to continue edit ?\n";
+                        cout<<"1: No\n2: Press anything\n";
+                        int isCon;cin>>isCon;
+                        if(isCon==1) isBreak=true;
+                    }  
+                }while(isBreak==false);
+                break;
+            }
+        }   
+    }
+}
+void sortStudent(){
+    cout<<"<===== Sort Mode =====>\n";
+    
+    cout<<"1: Sort by name\n2: Sort by score\n3: Display\n";
+    string tmp;cin>>tmp;
+    int mode = isSafe(tmp);
+    if(mode == 1 || mode == 2){
+        students = studentservice.sortStudent(mode);
+    }
+    else if(mode == 3){
+        if(students.empty()){
+            cout<<"Empty list! ";
+        }
+        else{
+            cout<<"<===== Sort list =====>\n";
+            for(auto& st:students ){
+                st.display();
+            }
+        }
+    }
+    else{
+        cout<<"Invalid Input!\n";
+    }
+
+}
+void saveStudents(){
+    cout<<"<===== Save Mode =====>\n";
+    cout<<"1:Save with Overwrite !\n2:Save wit Append\n";
+    string tmp;cin>>tmp;
+    int choice = isSafe(tmp);
+    if(choice == 1){
+        cout<<"Warning: This mode will clear All data and write.\nDo you want to continue!\n";
+        cout<<"1: Yes\n2: No\n";
+        string strChoice;cin>>strChoice;
+        int isOk = isSafe(strChoice);
+        if(isOk == 2){
+            cout<<"Exit save mode\n";
+            return;
+        }
+        else if(isOk == 0){
+            cout<<"Invalid input !";
+        }
+        else{
+            cout<<"Enter file name";cin.ignore();
+            string filename; getline(cin,filename);
+            studentstorage.saveToCSV(studentservice.getStudent(),filename,1)
+        }
+    }
+}
 int main(){
     int choice;
     string tmp;
     bool ok;
     do{
-        cout<<"\n<=====Student Management=====>\n";
-        cout<<"1: Add new student"<<endl;
-        cout<<"2: Remove student by ID\n";
-        cout<<"3: Display all student\n";
-        cout<<"4: Find Student\n";
-        cout<<"5: Edit Student\n";
-        cout<<"6: Infomation\n";
-        cout<<"7: Quit!"<<endl;
-        cout<<"-----------------\n";
-        cout<<"Enter you choice: ";
+        UIMenu();
         cin>>tmp;
         choice = isSafe(tmp);
         if(choice == 0 || choice <0 || choice > 7){
@@ -70,101 +218,43 @@ int main(){
         else{
             switch (choice){
                 case 1:{
-                    cout<<"<=====Add Mode=====>\n";
-                    int n; 
-                    cout<<"Enter the number of students: ";cin>>n;
-                    for (int i = 0;i<n;i++){
-                        int id,age;
-                        string name;
-                        double score;cin.ignore();
-                        cout<<"Enter Name: "; getline(cin,name);
-                        cout<<"Enter age: ";cin>>age;
-                        cout<<"Enter Score: "; cin>>score;
-                        Student st(name,age,score);
-                        studentservice.addStudent(st);
-                        cout<<"------------------------\n";
-                    }
+                    addMode();
                     cout<<"Break add mode\n";   
                     break;
                 }
                 case 2:{
-                    cout<<"<=====Remove Mode=====>\n";
-                    int id;
-                    cout<<"Enter ID"<<endl;cin>>id;
-                    if(studentservice.removeStudent(id)){
-                        cout<<"Done !"<<endl;
-                    }
-                    else cout<<"Don't exist this student !"<<endl;
+                    removeMode();
                     break;
                 }
                 case 3:{
-                    cout<<"<===== INFORMATION OF ALL STUDENT=====>\n";
-                    printf("%-5s %-25s %-5s %-6s\n", "ID", "Name", "Age", "Score");
-                    studentservice.displayAll();
+                    infMode();
                     break;
                 }
                 case 4:{
-                    cout<<"<===== Find Mode =====>\n";
-                    cin.ignore();
-                    cout<<"Enter ID or Name: ";
-                    string inp;getline(cin,inp);
-                    Student* st = studentservice.findStudent(inp);
-                    if(!st){
-                        cout<<"No student found with ID or Name!\n";
-                        
-                    }
-                    else{
-                        printf("ID: %d\nName: %s\n Age: %d\nScore: %.2f\n",st->getId(),st->getName().c_str(),st->getAge(),st->getScore());
-                    }
+                    findMode();
                     break;
                 }
                 case 5:{
-                    bool continueEditMode = true;
-                    while(continueEditMode){
-                        int id;
-                        cout<<"<=====Edit Mode=====>"<<endl;
-                        cout<<"Enter ID: ";cin>>id;
-                        Student* st = studentservice.findStudent(to_string(id)); 
-                        if(!st){
-                            cout<<"No student found with ID\n";
-                            cout<<"Do you want to continue edit ?\n";
-                            cout<<"1: No\nPress anything: Yes\n";
-                            int c;cin>>c;
-                            if(c == 1) break;
-                            else continue;
-                        }
-                        else{
-                            bool isBreak = false;
-                            do{
-                                cout<<st->getName()<<" "<<st->getAge()<<" "<<st->getScore()<<endl;
-                                cout<<"1:Edit name\n";
-                                cout<<"2:Edit age\n";
-                                cout<<"3:Edit score\n";
-                                cout<<"4:Quit mode\n";
-                                cin>>choice;
-                                if(choice == 4){
-                                    isBreak = true;
-                                }
-                                else{
-                                    editMode(choice,id);
-                                    cout<<"Do you want to continue edit ?\n";
-                                    cout<<"1: No\n2: Press anything\n";
-                                    int isCon;cin>>isCon;
-                                    if(isCon==1) isBreak=true;
-                                }  
-                            }while(isBreak==false);
-                            break;
-                        }
-                    }
-                    
+                    editMode();
+                    break;   
                 }
                 case 6:{
+                    sortStudent();
+                    break;
+                }
+                case 7:{
+                    
+                    break;
+                }
+                case 8:{
+
+                }
+                case 9:{
                     infomation();
                     break;
                 }
             }
-        }
-        
+        }    
     }   
-    while(choice !=7);
+    while(choice !=9);
 }
