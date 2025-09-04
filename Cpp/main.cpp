@@ -198,11 +198,25 @@ void saveStudents(){
             cout<<"Invalid input !";
         }
         else{
-            cout<<"Enter file name";cin.ignore();
+            cout<<"Enter file name: ";cin.ignore();
             string filename; getline(cin,filename);
-            studentstorage.saveToCSV(studentservice.getStudent(),filename,1)
+            studentstorage.saveToCSV(studentservice.getStudent(),filename+".csv",1);
         }
     }
+    else if(choice == 2){
+        cout<<"Enter file name: ";cin.ignore();
+        string filename; getline(cin,filename);
+        studentstorage.saveToCSV(studentservice.getStudent(),filename+".csv",1);
+    }
+    else{
+        cout<<"Invalid input !";
+    }
+}
+void loadMode(){
+    cout<<"Enter file name: ";cin.ignore();
+    string filename;getline(cin,filename);
+    vector<Student> sts = studentstorage.loadDataFromCSV(filename);
+    studentservice.pullData(sts);
 }
 int main(){
     int choice;
@@ -212,7 +226,7 @@ int main(){
         UIMenu();
         cin>>tmp;
         choice = isSafe(tmp);
-        if(choice == 0 || choice <0 || choice > 7){
+        if(choice == 0 || choice <0 || choice > 10){
             cout<<"Invalid input!\n";
         }
         else{
@@ -243,11 +257,12 @@ int main(){
                     break;
                 }
                 case 7:{
-                    
+                    saveStudents();
                     break;
                 }
                 case 8:{
-
+                    loadMode();
+                    break;
                 }
                 case 9:{
                     infomation();
@@ -256,5 +271,5 @@ int main(){
             }
         }    
     }   
-    while(choice !=9);
+    while(choice !=10);
 }
