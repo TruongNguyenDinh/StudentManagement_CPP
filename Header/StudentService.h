@@ -19,6 +19,6 @@ class StudentService{
     void editScore(int id,double newScore);
     vector<Student> sortStudent(int mode);
     vector<Student> getStudent() const;
-
+    void pullData(vector<Student>& sts);
 };
 #endif
