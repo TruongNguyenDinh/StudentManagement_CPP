@@ -118,3 +118,9 @@ vector<Student> StudentService::sortStudent(int mode){
 vector<Student> StudentService::getStudent() const{
     return students;
 }
+void StudentService::pullData(vector<Student>& sts){
+    students.insert(students.end(),
+    make_move_iterator(sts.begin()),
+    make_move_iterator(sts.end()));
+    sts.clear();
+}
