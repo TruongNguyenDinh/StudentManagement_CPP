@@ -5,16 +5,11 @@
 
 void StudentStorage::saveToCSV(const std::vector<Student>& students,const string& filename,int mode){
     const std::string filePath = "../Storage/"+filename;
-    std::ofstream file;
-    if(mode == 1){ // save data with override
-       file.open(filePath);
-    }
-    else{
-        file.open(filePath,std::ios::app);
-    }
-    if(file.is_open()){
-        std::cerr<<"Cannot open this file\n";
-        return;
+    std::fstream file;
+    if (mode == 1) { // override (ghi đè)
+        file.open(filePath, std::ios::out | std::ios::trunc);
+    } else { // append
+        file.open(filePath, std::ios::out | std::ios::app);
     }
     if(mode == 1){
         file<<"id,name,age,score\n";
@@ -28,7 +23,7 @@ void StudentStorage::saveToCSV(const std::vector<Student>& students,const string
 
 std::vector<Student> StudentStorage::loadDataFromCSV(const string& filename){
     vector<Student> students;
-    std::string filePath = "../Storage"+filename+".csv";
+    std::string filePath = "../Storage/"+filename+".csv";
     std::ifstream file(filePath);
 
     if(!file.is_open()){
